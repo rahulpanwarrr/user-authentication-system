@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            flex: 1;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        .error {
+            color: red;
+            font-size: 0.9em;
+            margin-top: 5px;
+            display: none;
+        }
+        .success {
+            color: green;
+            font-size: 0.9em;
+            margin-top: 5px;
+            display: none;
+        }
+        input.invalid {
+            border-color: red;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #333;
+        }
+        .requirements {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+        .requirements ul {
+            margin: 5px 0;
+            padding-left: 20px;
+        }
+        .requirements li {
+            margin: 3px 0;
+        }
+        .tab-container {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            background-color: #ddd;
+            cursor: pointer;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+        }
+        .tab.active {
+            background-color: white;
+            font-weight: bold;
+        }
+        .welcome-message {
+            text-align: center;
+            padding: 20px;
+            background-color: #e8f5e9;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .logout-btn {
+            background-color: #f44336;
+            margin-top: 10px;
+        }
+        #loggedInContainer {
+            display: none;
+        }
+        #authContainer {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center;">Authentication System</h1>
+
+    <div id="loggedInContainer">
+        <div class="welcome-message" id="welcomeMessage">
+            <h2>Welcome, <span id="userNameDisplay"></span>!</h2>
+            <p>You are successfully logged in.</p>
+            <button class="logout-btn" id="logoutBtn">Logout</button>
+        </div>
+    </div>
+
+    <div id="authContainer">
+        <div class="tab-container">
+            <div class="tab active" data-tab="login">Login</div>
+            <div class="tab" data-tab="register">Register</div>
+        </div>
+        
+        <div class="container">
+            
+            <div class="card" id="loginCard">
+                <h2>Login</h2>
+                <form id="loginForm" novalidate>
+                    <div class="form-group">
+                        <label for="loginUsername">Username:</label>
+                        <input type="text" id="loginUsername" name="username">
+                        <div id="loginUsernameError" class="error"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="loginPassword">Password:</label>
+                        <input type="password" id="loginPassword" name="password">
+                        <div id="loginPasswordError" class="error"></div>
+                    </div>
+                    
+                    <div id="loginMessage" class="error"></div>
+                    <button type="submit">Login</button>
+                </form>
+            </div>
+            
+            
+            <div class="card" id="registerCard" style="display: none;">
+                <h2>Register</h2>
+                <form id="registerForm" novalidate>
+                    <div class="form-group">
+                        <label for="regUsername">Username:</label>
+                        <input type="text" id="regUsername" name="username">
+                        <div id="regUsernameError" class="error"></div>
+                        <div class="requirements">
+                            <ul>
+                                <li>At least 3 characters long</li>
+                                <li>Only letters, numbers, and underscores</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="regEmail">Email:</label>
+                        <input type="email" id="regEmail" name="email">
+                        <div id="regEmailError" class="error"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="regPassword">Password:</label>
+                        <input type="password" id="regPassword" name="password">
+                        <div id="regPasswordError" class="error"></div>
+                        <div class="requirements">
+                            <ul>
+                                <li>Minimum 8 characters</li>
+                                <li>At least one uppercase letter</li>
+                                <li>At least one lowercase letter</li>
+                                <li>At least one number</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="regConfirmPassword">Confirm Password:</label>
+                        <input type="password" id="regConfirmPassword" name="confirmPassword">
+                        <div id="regConfirmPasswordError" class="error"></div>
+                    </div>
+                    
+                    <div id="registerMessage" class="success"></div>
+                    <button type="submit">Register</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        
+        if (!localStorage.getItem('users')) {
+            localStorage.setItem('users', JSON.stringify([]));
+        }
+        
+        
+        const validators = {
+            username: (value) => {
+                if (value.length < 3) {
+                    return 'Username must be at least 3 characters long';
+                }
+                if (!/^[a-zA-Z0-9_]+$/.test(value)) {
+                    return 'Username can only contain letters, numbers, and underscores';
+                }
+                return '';
+            },
+            
+            email: (value) => {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(value)) {
+                    return 'Please enter a valid email address';
+                }
+                return '';
+            },
+            
+            password: (value) => {
+                if (value.length < 8) {
+                    return 'Password must be at least 8 characters long';
+                }
+                if (!/[A-Z]/.test(value)) {
+                    return 'Password must contain at least one uppercase letter';
+                }
+                if (!/[a-z]/.test(value)) {
+                    return 'Password must contain at least one lowercase letter';
+                }
+                if (!/[0-9]/.test(value)) {
+                    return 'Password must contain at least one number';
+                }
+                return '';
+            },
+            
+            confirmPassword: (value, password) => {
+                if (value !== password) {
+                    return 'Passwords do not match';
+                }
+                return '';
+            }
+        };
+
+        
+        function showError(field, errorElement, message) {
+            field.classList.add('invalid');
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+        }
+
+        function hideError(field, errorElement) {
+            field.classList.remove('invalid');
+            errorElement.style.display = 'none';
+        }
+
+        function validateField(field, formType = 'reg') {
+            const value = field.value.trim();
+            const fieldName = field.name;
+            const errorElement = document.getElementById(`${formType}${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}Error`);
+            
+            if (!value) {
+                showError(field, errorElement, `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} is required`);
+                return false;
+            }
+
+            let validationError = '';
+            if (fieldName === 'confirmPassword') {
+                const password = document.getElementById(`${formType}Password`).value;
+                validationError = validators.confirmPassword(value, password);
+            } else if (validators[fieldName]) {
+                validationError = validators[fieldName](value);
+            }
+
+            if (validationError) {
+                showError(field, errorElement, validationError);
+                return false;
+            }
+
+            hideError(field, errorElement);
+            return true;
+        }
+
+        
+        function getAllUsers() {
+            return JSON.parse(localStorage.getItem('users') || '[]');
+        }
+
+        function saveUser(user) {
+            const users = getAllUsers();
+            users.push(user);
+            localStorage.setItem('users', JSON.stringify(users));
+        }
+
+        function getUserByUsername(username) {
+            const users = getAllUsers();
+            return users.find(user => user.username === username);
+        }
+
+        displayUsers();
+
+        
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                const tabName = tab.getAttribute('data-tab');
+                if (tabName === 'login') {
+                    document.getElementById('loginCard').style.display = 'block';
+                    document.getElementById('registerCard').style.display = 'none';
+                } else {
+                    document.getElementById('loginCard').style.display = 'none';
+                    document.getElementById('registerCard').style.display = 'block';
+                }
+            });
+        });
+
+        
+        document.querySelectorAll('input').forEach(input => {
+            const formType = input.id.startsWith('login') ? 'login' : 'reg';
+            
+            input.addEventListener('blur', () => {
+                validateField(input, formType);
+            });
+            
+            input.addEventListener('input', () => {
+                if (input.value.trim().length > 0) {
+                    validateField(input, formType);
+                }
+            });
+        });
+
+        
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                username: document.getElementById('regUsername').value,
+                email: document.getElementById('regEmail').value,
+                password: document.getElementById('regPassword').value,
+                confirmPassword: document.getElementById('regConfirmPassword').value
+            };
+            
+            
+            let isValid = true;
+            const fields = ['username', 'email', 'password', 'confirmPassword'];
+            
+            fields.forEach(field => {
+                const input = document.getElementById(`reg${field.charAt(0).toUpperCase() + field.slice(1)}`);
+                if (!validateField(input, 'reg')) {
+                    isValid = false;
+                }
+            });
+            
+            if (!isValid) return;
+            
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: formData.username,
+                        email: formData.email,
+                        password: formData.password
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('registerMessage').textContent = 'Registration successful! You can now login.';
+                    document.getElementById('registerMessage').style.display = 'block';
+                    document.getElementById('registerForm').reset();
+                    document.querySelector('.tab[data-tab="login"]').click();
+                } else {
+                    document.getElementById('registerMessage').textContent = data.error || 'Registration failed';
+                    document.getElementById('registerMessage').style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                document.getElementById('registerMessage').textContent = 'An error occurred during registration';
+                document.getElementById('registerMessage').style.display = 'block';
+            }
+        });
+
+        
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    localStorage.setItem('username', username);
+                    localStorage.setItem('userRole', data.role);
+                    
+                    if (data.role === 'admin') {
+                        window.location.href = '/admin-dashboard.html';
+                    } else {
+                        document.getElementById('authContainer').style.display = 'none';
+                        document.getElementById('loggedInContainer').style.display = 'block';
+                        document.getElementById('userNameDisplay').textContent = username;
+                        document.getElementById('welcomeMessage').style.display = 'block';
+                    }
+                } else {
+                    document.getElementById('loginMessage').textContent = data.error || 'Login failed';
+                    document.getElementById('loginMessage').style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                document.getElementById('loginMessage').textContent = 'An error occurred during login';
+                document.getElementById('loginMessage').style.display = 'block';
+            }
+        });
+
+        
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('username');
+            localStorage.removeItem('userRole');
+            document.getElementById('loggedInContainer').style.display = 'none';
+            document.getElementById('authContainer').style.display = 'block';
+        });
+
+    
+        const loggedInUser = localStorage.getItem('username');
+        const userRole = localStorage.getItem('userRole');
+        if (loggedInUser) {
+            if (userRole === 'admin') {
+                window.location.href = '/admin-dashboard.html';
+            } else {
+                document.getElementById('authContainer').style.display = 'none';
+                document.getElementById('loggedInContainer').style.display = 'block';
+                document.getElementById('userNameDisplay').textContent = loggedInUser;
+                document.getElementById('welcomeMessage').style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html> 

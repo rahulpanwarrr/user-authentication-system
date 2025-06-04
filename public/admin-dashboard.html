@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --sidebar-width: 250px;
+            --primary-color: #2c3e50;
+            --secondary-color: #34495e;
+            --accent-color: #3498db;
+            --text-color: #2c3e50;
+            --light-bg: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-color);
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: var(--sidebar-width);
+            background: var(--primary-color);
+            color: white;
+            padding: 20px;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 20px 0;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-header h3 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .admin-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .admin-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #fff;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+
+        .nav-item {
+            margin: 10px 0;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .nav-link.active {
+            background: var(--accent-color);
+        }
+
+        .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .page-header {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            border: none;
+        }
+
+        .card-header {
+            background: white;
+            border-bottom: 1px solid #eee;
+            padding: 15px 20px;
+            font-weight: 600;
+        }
+
+        .table {
+            margin: 0;
+        }
+
+        .table th {
+            border-top: none;
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+
+        .btn-action {
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin: 0 2px;
+        }
+
+        .btn-edit {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #e74c3c;
+            color: white;
+        }
+
+        /* Modal Styles */
+        .modal-content {
+            border-radius: 10px;
+            border: none;
+        }
+
+        .modal-header {
+            background: var(--primary-color);
+            color: white;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .form-control {
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            padding: 10px;
+        }
+
+        .form-control:focus {
+            border-color: var(--accent-color);
+            box-shadow: none;
+        }
+
+        /* Stats Cards */
+        .stats-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .stats-card i {
+            font-size: 2rem;
+            color: var(--accent-color);
+        }
+
+        .stats-card h3 {
+            margin: 10px 0;
+            font-size: 1.8rem;
+        }
+
+        .stats-card p {
+            color: #666;
+            margin: 0;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 0;
+                padding: 0;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .sidebar.active {
+                width: var(--sidebar-width);
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3>Admin Panel</h3>
+            <div class="admin-info">
+                <div class="admin-avatar" id="adminAvatar">A</div>
+                <span id="adminName">Admin</span>
+            </div>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="#dashboard" class="nav-link active" data-section="dashboard">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#users" class="nav-link" data-section="users">
+                    <i class="fas fa-users"></i> Users
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#attendance" class="nav-link" data-section="attendance">
+                    <i class="fas fa-calendar-check"></i> Attendance
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div id="dashboard" class="section">
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="stats-card text-center">
+                        <i class="fas fa-users fa-2x"></i>
+                        <h3 id="totalUsers">0</h3>
+                        <p>Total Users</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="stats-card text-center">
+                        <i class="fas fa-user-check fa-2x"></i>
+                        <h3 id="activeUsers">0</h3>
+                        <p>Active Users</p>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-4">
+                <div class="col-md-8 mx-auto">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <span>Daily Attendance Breakdown</span>
+                            <input type="date" class="form-control w-auto" id="breakdownDatePicker">
+                        </div>
+                        <div class="card-body">
+                            <canvas id="attendanceBreakdownChart" height="200"></canvas>
+                            <div class="mt-2"><small><b>Legend:</b> Present, Absent, Late, Half Day</small></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="users" class="section" style="display: none;">
+            <div class="page-header d-flex justify-content-between align-items-center">
+                <h2>User Management</h2>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                    <i class="fas fa-plus"></i> Add User
+                </button>
+            </div>
+            
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Username</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="attendance" class="section" style="display: none;">
+            <div class="page-header">
+                <h2>Attendance Management</h2>
+            </div>
+                        <div class="card mb-4">
+                            <div class="card-body">
+                    <form id="attendanceSelectorForm" class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                                        <label for="attendanceYear" class="form-label">Year</label>
+                            <select class="form-select" id="attendanceYear" required></select>
+                                        </div>
+                        <div class="col-md-3">
+                                        <label for="attendanceMonth" class="form-label">Month</label>
+                            <select class="form-select" id="attendanceMonth" required>
+                                            <option value="01">January</option>
+                                            <option value="02">February</option>
+                                            <option value="03">March</option>
+                                            <option value="04">April</option>
+                                            <option value="05">May</option>
+                                            <option value="06">June</option>
+                                            <option value="07">July</option>
+                                            <option value="08">August</option>
+                                            <option value="09">September</option>
+                                            <option value="10">October</option>
+                                            <option value="11">November</option>
+                                            <option value="12">December</option>
+                                        </select>
+                                    </div>
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-primary">Load Attendance Table</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+            <div id="attendanceTableContainer"></div>
+
+            <!-- Filter & Edit Attendance Section -->
+            <div class="card mt-5">
+                            <div class="card-header">
+                    <h5>Filter & Edit Attendance</h5>
+                            </div>
+                            <div class="card-body">
+                    <form id="attendanceFilterForm" class="row g-3 align-items-end mb-3">
+                        <div class="col-md-3">
+                            <label for="filterUser" class="form-label">User</label>
+                            <select class="form-select" id="filterUser" required></select>
+                                </div>
+                        <div class="col-md-3">
+                            <label for="filterYear" class="form-label">Year</label>
+                            <select class="form-select" id="filterYear" required></select>
+                                </div>
+                        <div class="col-md-3">
+                            <label for="filterMonth" class="form-label">Month</label>
+                            <select class="form-select" id="filterMonth" required>
+                                            <option value="01">January</option>
+                                            <option value="02">February</option>
+                                            <option value="03">March</option>
+                                            <option value="04">April</option>
+                                            <option value="05">May</option>
+                                            <option value="06">June</option>
+                                            <option value="07">July</option>
+                                            <option value="08">August</option>
+                                            <option value="09">September</option>
+                                            <option value="10">October</option>
+                                            <option value="11">November</option>
+                                            <option value="12">December</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                            <button type="submit" class="btn btn-primary">Load Attendance</button>
+                                    </div>
+                                </form>
+                    <div id="filterAttendanceTableContainer"></div>
+                                </div>
+                                            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="editUserModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editUserForm">
+                        <input type="hidden" id="editUsername">
+                        <div class="mb-3">
+                            <label class="form-label">Username</label>
+                            <input type="text" class="form-control" id="editUsernameDisplay" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" id="editEmail" required>
+                            <div class="form-text">Enter a valid email address</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Password</label>
+                            <input type="password" class="form-control" id="editPassword" minlength="8">
+                            <div class="form-text">Leave blank to keep current password</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Role</label>
+                            <select class="form-control" id="editRole" required>
+                                <option value="user">User</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addUserModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addUserForm" novalidate>
+                        <div class="mb-3">
+                            <label class="form-label">Username</label>
+                            <input type="text" class="form-control" id="addUsername" required 
+                                   pattern="^[a-zA-Z0-9_]{3,20}$" minlength="3" maxlength="20">
+                            <div class="form-text">Username must be 3-20 characters long and can only contain letters, numbers, and underscores</div>
+                            <div class="invalid-feedback" id="addUsernameError"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" id="addEmail" required>
+                            <div class="form-text">Enter a valid email address</div>
+                            <div class="invalid-feedback" id="addEmailError"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Password</label>
+                            <input type="password" class="form-control" id="addPassword" required 
+                                   pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$" minlength="8">
+                            <div class="form-text">Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number</div>
+                            <div class="invalid-feedback" id="addPasswordError"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Confirm Password</label>
+                            <input type="password" class="form-control" id="addConfirmPassword" required>
+                            <div class="form-text">Please confirm your password</div>
+                            <div class="invalid-feedback" id="addConfirmPasswordError"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Role</label>
+                            <select class="form-control" id="addRole" required>
+                                <option value="user">User</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Add User</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            sessionStorage.clear();
+            localStorage.clear();
+            window.location.href = '/auth-system.html';
+            window.history.pushState(null, '', '/auth-system.html');
+            window.onpopstate = function() {
+                window.history.pushState(null, '', '/auth-system.html');
+            };
+        });
+
+        window.onload = function() {
+            window.history.pushState(null, '', window.location.href);
+            window.onpopstate = function() {
+                window.history.pushState(null, '', window.location.href);
+            };
+        };
+
+        const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+        if (!currentUser || currentUser.role !== 'admin') {
+            sessionStorage.clear();
+            localStorage.clear();
+            window.location.replace('/auth-system.html');
+            window.history.pushState(null, '', '/auth-system.html');
+            window.onpopstate = function() {
+                window.history.pushState(null, '', '/auth-system.html');
+            };
+        }
+
+        document.getElementById('adminName').textContent = currentUser.username;
+        document.getElementById('adminAvatar').textContent = currentUser.username.charAt(0).toUpperCase();
+
+        async function loadUsers() {
+            try {
+                const response = await fetch('/api/admin/users', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username: currentUser.username })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch users');
+                }
+
+                const users = await response.json();
+                const tbody = document.getElementById('usersTableBody');
+                tbody.innerHTML = '';
+
+                users.forEach(user => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${user.username}</td>
+                        <td>${user.email}</td>
+                        <td>${user.role || 'user'}</td>
+                        <td>
+                            <button class="btn btn-action btn-edit" onclick="editUser('${user.username}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-action btn-delete" onclick="deleteUser('${user.username}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                document.getElementById('totalUsers').textContent = users.length;
+                document.getElementById('activeUsers').textContent = users.filter(u => u.role === 'user').length;
+            } catch (error) {
+                console.error('Error loading users:', error);
+                showToast('Error loading users', 'error');
+            }
+        }
+
+        async function editUser(username) {
+            try {
+                const users = await (await fetch('/api/admin/users', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username: currentUser.username })
+                })).json();
+
+                const user = users.find(u => u.username === username);
+                if (user) {
+                    document.getElementById('editUsername').value = user.username;
+                    document.getElementById('editUsernameDisplay').value = user.username;
+                    document.getElementById('editEmail').value = user.email;
+                    document.getElementById('editPassword').value = ''; // Clear password field
+                    document.getElementById('editRole').value = user.role || 'user';
+                    
+                    // Show modal
+                    const modal = new bootstrap.Modal(document.getElementById('editUserModal'));
+                    modal.show();
+                }
+            } catch (error) {
+                console.error('Error loading user data:', error);
+                alert('Error loading user data. Please try again.');
+            }
+        }
+
+        async function deleteUser(username) {
+            if (confirm('Are you sure you want to delete this user?')) {
+                try {
+                    const response = await fetch('/api/admin/delete-user', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            username: currentUser.username,
+                            targetUsername: username
+                        })
+                    });
+
+                    if (response.ok) {
+                        loadUsers();
+                    }
+                } catch (error) {
+                    console.error('Error deleting user:', error);
+                }
+            }
+        }
+
+        function showSection(sectionId) {
+            try {
+                console.log('Switching to section:', sectionId);
+                
+            document.querySelectorAll('.section').forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            const selectedSection = document.getElementById(sectionId);
+                if (!selectedSection) {
+                    console.error(`Section with ID "${sectionId}" not found`);
+                    return;
+            }
+                selectedSection.style.display = 'block';
+
+            document.querySelectorAll('.nav-link').forEach(link => {
+                if (link.getAttribute('data-section') === sectionId) {
+                    link.classList.add('active');
+                    } else {
+                        link.classList.remove('active');
+                }
+            });
+
+                switch(sectionId) {
+                    case 'dashboard':
+                loadDashboardStats();
+                        break;
+                    case 'users':
+                        loadUsers();
+                        break;
+                }
+            } catch (error) {
+                console.error('Error in showSection:', error);
+                showToast('Error switching sections', 'error');
+            }
+        }
+
+        
+        function initializePage() {
+            try {
+                
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                if (this.id === 'logoutBtn') {
+                    sessionStorage.removeItem('currentUser');
+                    window.location.replace('/auth-system.html');
+                    return;
+                }
+
+                const section = this.getAttribute('data-section');
+                if (section) {
+                    showSection(section);
+                }
+            });
+        });
+
+                showSection('dashboard');
+            } catch (error) {
+                console.error('Error initializing page:', error);
+                showToast('Error initializing page', 'error');
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializePage);
+        } else {
+            initializePage();
+        }
+
+        async function loadDashboardStats() {
+            try {
+                const response = await fetch('/api/admin/users', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username: currentUser.username })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch users');
+                }
+
+                const users = await response.json();
+                const totalUsersElement = document.getElementById('totalUsers');
+                const activeUsersElement = document.getElementById('activeUsers');
+
+                if (totalUsersElement) totalUsersElement.textContent = users.length;
+                if (activeUsersElement) activeUsersElement.textContent = users.filter(u => u.role === 'user').length;
+            } catch (error) {
+                console.error('Error loading dashboard stats:', error);
+                showToast('Error loading dashboard stats', 'error');
+            }
+        }
+
+        
+        document.getElementById('editUserForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('editUsername').value;
+            const email = document.getElementById('editEmail').value;
+            const password = document.getElementById('editPassword').value;
+            const role = document.getElementById('editRole').value;
+
+            
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert('Please enter a valid email address');
+                return;
+            }
+
+    
+            if (password && password.length < 8) {
+                alert('Password must be at least 8 characters long');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/admin/edit-user', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: currentUser.username,
+                        targetUsername: username,
+                        updates: {
+                            email,
+                            password: password || undefined, 
+                            role
+                        }
+                    })
+                });
+
+                if (response.ok) {
+                    bootstrap.Modal.getInstance(document.getElementById('editUserModal')).hide();
+                    loadUsers();
+                    alert('User updated successfully');
+                } else {
+                    const data = await response.json();
+                    alert(data.error || 'Error updating user');
+                }
+            } catch (error) {
+                console.error('Error updating user:', error);
+                alert('Error updating user. Please try again.');
+            }
+        });
+
+        
+        document.querySelector('.page-header .btn-primary').setAttribute('data-bs-target', '#addUserModal');
+
+        
+        const validators = {
+            username: (value) => {
+                if (!value) return 'Username is required';
+                if (value.length < 3 || value.length > 20) return 'Username must be between 3 and 20 characters';
+                if (!/^[a-zA-Z0-9_]+$/.test(value)) return 'Username can only contain letters, numbers, and underscores';
+                return '';
+            },
+            
+            email: (value) => {
+                if (!value) return 'Email is required';
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(value)) return 'Please enter a valid email address';
+                return '';
+            },
+            
+            password: (value) => {
+                if (!value) return 'Password is required';
+                if (value.length < 8) return 'Password must be at least 8 characters long';
+                if (!/[A-Z]/.test(value)) return 'Password must contain at least one uppercase letter';
+                if (!/[a-z]/.test(value)) return 'Password must contain at least one lowercase letter';
+                if (!/[0-9]/.test(value)) return 'Password must contain at least one number';
+                return '';
+            },
+            
+            confirmPassword: (value, password) => {
+                if (!value) return 'Please confirm your password';
+                if (value !== password) return 'Passwords do not match';
+                return '';
+            }
+        };
+
+        function showError(input, errorElement, message) {
+            if (!errorElement) {
+                console.error('Error element not found for input:', input.id);
+                return;
+            }
+            input.classList.add('is-invalid');
+            errorElement.textContent = message;
+        }
+
+        function hideError(input, errorElement) {
+            if (!errorElement) {
+                console.error('Error element not found for input:', input.id);
+                return;
+            }
+            input.classList.remove('is-invalid');
+            errorElement.textContent = '';
+        }
+
+        function validateField(input) {
+            const value = input.value.trim();
+            const fieldName = input.id;
+            const errorElement = document.getElementById(`${fieldName}Error`);
+            
+            if (!errorElement) {
+                console.error(`Error element not found for field: ${fieldName}`);
+                return true;
+            }
+            
+            let validationError = '';
+            if (fieldName === 'addConfirmPassword') {
+                const password = document.getElementById('addPassword').value;
+                validationError = validators.confirmPassword(value, password);
+            } else if (validators[fieldName.replace('add', '')]) {
+                validationError = validators[fieldName.replace('add', '')](value);
+            }
+
+            if (validationError) {
+                showError(input, errorElement, validationError);
+                return false;
+            }
+
+            hideError(input, errorElement);
+            return true;
+        }
+
+        
+        document.getElementById('addUserForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            console.log('Add user form submitted');
+            
+            const username = document.getElementById('addUsername');
+            const email = document.getElementById('addEmail');
+            const password = document.getElementById('addPassword');
+            const confirmPassword = document.getElementById('addConfirmPassword');
+            const role = document.getElementById('addRole');
+
+            let isValid = true;
+            isValid = validateField(username) && isValid;
+            isValid = validateField(email) && isValid;
+            isValid = validateField(password) && isValid;
+            isValid = validateField(confirmPassword) && isValid;
+
+            if (!isValid) {
+                console.log('Form validation failed');
+                return;
+            }
+
+            try {
+                console.log('Sending request to create user');
+                const response = await fetch('/api/admin/create-user', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: currentUser.username,
+                        newUser: {
+                            username: username.value.trim(),
+                            email: email.value.trim(),
+                            password: password.value,
+                            role: role.value
+                        }
+                    })
+                });
+
+                console.log('Response status:', response.status);
+                const data = await response.json();
+                console.log('Response data:', data);
+
+                if (response.ok) {
+                    console.log('User added successfully');
+                    bootstrap.Modal.getInstance(document.getElementById('addUserModal')).hide();
+                    document.getElementById('addUserForm').reset();
+                    loadUsers();
+                    showToast('User added successfully', 'success');
+                } else {
+                    console.log('Error adding user:', data.error);
+                    
+                    if (data.error.includes('username')) {
+                        showError(username, document.getElementById('addUsernameError'), 'Username already exists');
+                    } else if (data.error.includes('email')) {
+                        showError(email, document.getElementById('addEmailError'), 'Email already exists');
+                    } else {
+                        showToast(data.error || 'Error adding user', 'error');
+                    }
+                }
+            } catch (error) {
+                console.error('Error adding user:', error);
+                showToast('Error adding user. Please try again.', 'error');
+            }
+        });
+
+        
+        document.querySelectorAll('#addUserForm input').forEach(input => {
+            input.addEventListener('input', () => {
+                validateField(input);
+            });
+
+            input.addEventListener('blur', () => {
+                validateField(input);
+            });
+        });
+
+    
+        function showToast(message, type = 'info') {
+            try {
+                
+                const existingToasts = document.querySelectorAll('.toast');
+                existingToasts.forEach(toast => toast.remove());
+
+            
+                const toast = document.createElement('div');
+                toast.className = `toast align-items-center text-white bg-${type} border-0 position-fixed bottom-0 end-0 m-3`;
+                toast.setAttribute('role', 'alert');
+                toast.setAttribute('aria-live', 'assertive');
+                toast.setAttribute('aria-atomic', 'true');
+                
+                toast.innerHTML = `
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            ${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                `;
+                
+                document.body.appendChild(toast);
+                const bsToast = new bootstrap.Toast(toast, {
+                    autohide: true,
+                    delay: 3000
+                });
+                bsToast.show();
+                
+                toast.addEventListener('hidden.bs.toast', () => {
+                    toast.remove();
+                });
+            } catch (error) {
+                console.error('Error showing toast:', error);
+            }
+        }
+
+        
+        async function loadUsersForAttendance() {
+            try {
+                const response = await fetch('/api/admin/users', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username: currentUser.username })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch users');
+                }
+
+                const users = await response.json();
+                const userSelect = document.getElementById('attendanceUser');
+                userSelect.innerHTML = '<option value="">Choose user...</option>';
+                
+                users.forEach(user => {
+                    if (user.role === 'user') {         
+                        const option = document.createElement('option');
+                        option.value = user.username;
+                        option.textContent = user.username;
+                        userSelect.appendChild(option);
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading users:', error);
+                showToast('Error loading users', 'error');
+            }
+        }
+
+        function populateYearDropdown() {
+            const yearSelect = document.getElementById('attendanceYear');
+            const currentYear = new Date().getFullYear();
+            
+            while (yearSelect.options.length > 1) {
+                yearSelect.remove(1);
+            }
+            
+            for (let year = 2000; year <= currentYear + 10; year++) {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                yearSelect.appendChild(option);
+            }
+        }
+
+        
+        async function loadAttendanceRecords() {
+            const user = document.getElementById('attendanceUser').value;
+            const yearSelect = document.getElementById('attendanceYear');
+            const customYear = document.getElementById('customYear');
+            const year = yearSelect.style.display !== 'none' ? yearSelect.value : customYear.value;
+            const month = document.getElementById('attendanceMonth').value;
+
+            if (!user || !year || !month) {
+                showToast('Please select user, year and month', 'warning');
+                return;
+            }
+
+            const yearNum = parseInt(year);
+            if (isNaN(yearNum) || yearNum < 2000 || yearNum > 2100) {
+                showToast('Please enter a valid year between 2000 and 2100', 'warning');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/admin/get-attendance', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: currentUser.username,
+                        user,
+                        month: `${year}-${month}`
+                    })
+                });
+
+                let existingRecords = [];
+                if (response.ok) {
+                    existingRecords = await response.json();
+                }
+
+                const tbody = document.querySelector('#attendanceTable tbody');
+                tbody.innerHTML = '';
+
+                const daysInMonth = new Date(year, month, 0).getDate();
+                
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const date = `${year}-${month}-${day.toString().padStart(2, '0')}`;
+                    const existingRecord = existingRecords.find(r => r.date === date);
+                    
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${date}</td>
+                        <td>${user}</td>
+                        <td>
+                            <select class="form-select status-select" name="status_${date}">
+                                <option value="present" ${existingRecord?.status === 'present' ? 'selected' : ''}>Present</option>
+                                <option value="absent" ${existingRecord?.status === 'absent' ? 'selected' : ''}>Absent</option>
+                                <option value="late" ${existingRecord?.status === 'late' ? 'selected' : ''}>Late</option>
+                                <option value="half-day" ${existingRecord?.status === 'half-day' ? 'selected' : ''}>Half Day</option>
+                            </select>
+                        </td>
+                        <td>
+                            <input type="text" class="form-control remarks-input" name="remarks_${date}" 
+                                   placeholder="Add remarks" value="${existingRecord?.remarks || ''}">
+                        </td>
+                        <td>${existingRecord?.markedBy || ''}</td>
+                        <td><button class="btn btn-sm btn-primary" onclick="editAttendanceRecord('${user}','${date}','${existingRecord?.status || ''}','${(existingRecord?.remarks || '').replace(/'/g,"&#39;")}')">Edit</button></td>
+                    `;
+                    tbody.appendChild(tr);
+                }
+            } catch (error) {
+                console.error('Error loading attendance records:', error);
+                showToast('Error loading attendance records', 'error');
+            }
+        }
+
+        
+        async function saveAttendance() {
+            const user = document.getElementById('attendanceUser').value;
+            const yearSelect = document.getElementById('attendanceYear');
+            const customYear = document.getElementById('customYear');
+            const year = yearSelect.style.display !== 'none' ? yearSelect.value : customYear.value;
+            const month = document.getElementById('attendanceMonth').value;
+
+            if (!user || !year || !month) {
+                showToast('Please select user, year and month', 'warning');
+                return;
+            }
+
+            const attendanceData = [];
+            const rows = document.querySelectorAll('#attendanceTable tbody tr');
+            
+            rows.forEach(row => {
+                const date = row.cells[0].textContent;
+                const status = row.querySelector('.status-select').value;
+                const remarks = row.querySelector('.remarks-input').value;
+                attendanceData.push({ date, status, remarks });
+            });
+
+            console.log('Attendance data to send:', attendanceData);
+
+            if (!attendanceData.length || attendanceData.some(r => !r.date || !r.status)) {
+                showToast('Attendance data is incomplete. Please check all fields.', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/admin/mark-attendance', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: currentUser.username,
+                        user,
+                        month: `${year}-${month}`,
+                        attendanceData
+                    })
+                });
+
+                console.log('Attendance save response:', response);
+
+                if (response.ok) {
+                    showToast('Attendance saved successfully', 'success');
+                    loadAttendanceRecords();
+                } else {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to save attendance');
+                }
+            } catch (error) {
+                console.error('Error saving attendance:', error);
+                showToast(error.message || 'Error saving attendance', 'error');
+            }
+        }
+
+    
+        document.addEventListener('DOMContentLoaded', function() {
+        
+
+            
+            document.querySelector('a[data-section="attendance"]').addEventListener('click', function() {
+                loadUsersForAttendance();
+            });
+            });
+
+        
+        function populateAttendanceYearDropdown() {
+            const yearSelect = document.getElementById('attendanceYear');
+                const currentYear = new Date().getFullYear();
+            yearSelect.innerHTML = '';
+            for (let y = 2000; y <= currentYear + 1; y++) {
+                    const option = document.createElement('option');
+                    option.value = y;
+                    option.textContent = y;
+                    yearSelect.appendChild(option);
+                }
+            yearSelect.value = currentYear;
+            }
+
+        async function fetchAllUsers() {
+            const response = await fetch('/api/admin/users', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: currentUser.username })
+            });
+            if (!response.ok) throw new Error('Failed to fetch users');
+            const users = await response.json();
+            return users.filter(u => u.role === 'user');
+        }
+
+        function generateAttendanceTable(users, year, month) {
+            const daysInMonth = new Date(year, month, 0).getDate();
+            let html = '<div class="table-responsive"><table class="table table-bordered align-middle text-center"><thead><tr><th>User</th>';
+            for (let d = 1; d <= daysInMonth; d++) {
+                html += `<th>${d}</th>`;
+            }
+            html += '</tr></thead><tbody>';
+            users.forEach(user => {
+                html += `<tr><td>${user.username}</td>`;
+                for (let d = 1; d <= daysInMonth; d++) {
+                    const dateObj = new Date(year, month - 1, d);
+                    const dayOfWeek = dateObj.getDay();
+                    let present = '';
+                    let absent = '';
+                    let late = '';
+                    let halfDay = '';
+                    let holiday = '';
+                    if (dayOfWeek === 0 || dayOfWeek === 6) {
+                        holiday = 'selected';
+                    } else {
+                        present = 'selected';
+                    }
+                    html += `<td><select class="form-select form-select-sm attendance-cell" style="width:60px;min-width:60px;max-width:80px;" data-username="${user.username}" data-date="${year}-${month.toString().padStart(2,'0')}-${d.toString().padStart(2,'0')}">\n` +
+                        `<option value="present" ${present}>P</option>\n` +
+                        `<option value="absent" ${absent}>A</option>\n` +
+                        `<option value="late" ${late}>L</option>\n` +
+                        `<option value="half-day" ${halfDay}>HD</option>\n` +
+                        `<option value="holiday" ${holiday}>H</option>\n` +
+                    `</select></td>`;
+                }
+                html += '</tr>';
+            });
+            html += '</tbody></table></div>';
+            html += '<div class="mt-3"><button class="btn btn-success" id="saveAttendanceBtn">Save Attendance</button></div>';
+            document.getElementById('attendanceTableContainer').innerHTML = html;
+        }
+
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelector('a[data-section="attendance"]').addEventListener('click', function() {
+                populateAttendanceYearDropdown();
+                document.getElementById('attendanceTableContainer').innerHTML = '';
+            });
+        });
+
+        
+        document.getElementById('attendanceSelectorForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+            const year = document.getElementById('attendanceYear').value;
+            const month = document.getElementById('attendanceMonth').value;
+            try {
+                const users = await fetchAllUsers();
+                if (!users.length) {
+                    document.getElementById('attendanceTableContainer').innerHTML = '<div class="alert alert-warning">No users found.</div>';
+                    return;
+                }
+                generateAttendanceTable(users, year, month);
+            } catch (err) {
+                document.getElementById('attendanceTableContainer').innerHTML = '<div class="alert alert-danger">Failed to load users.</div>';
+            }
+            });
+
+        document.addEventListener('click', async function(e) {
+            if (e.target && e.target.id === 'saveAttendanceBtn') {
+                const year = document.getElementById('attendanceYear').value;
+                const month = document.getElementById('attendanceMonth').value;
+                const selects = document.querySelectorAll('.attendance-cell');
+                const attendanceData = [];
+                selects.forEach(sel => {
+                    attendanceData.push({
+                        username: sel.getAttribute('data-username'),
+                        date: sel.getAttribute('data-date'),
+                        status: sel.value
+                    });
+                });
+                const grouped = {};
+                attendanceData.forEach(r => {
+                    if (!grouped[r.username]) grouped[r.username] = [];
+                    grouped[r.username].push({ date: r.date, status: r.status });
+                });
+                let success = true;
+                for (const [user, records] of Object.entries(grouped)) {
+                    const res = await fetch('/api/admin/mark-attendance', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username: currentUser.username, user, month: `${year}-${month}`, attendanceData: records })
+                    });
+                    if (!res.ok) success = false;
+                }
+                if (success) {
+                    showToast('Attendance saved successfully', 'success');
+                } else {
+                    showToast('Some attendance records failed to save', 'danger');
+                }
+            }
+        });
+
+        async function populateFilterEditDropdowns() {
+            const userSelect = document.getElementById('filterUser');
+            userSelect.innerHTML = '';
+            try {
+                const response = await fetch('/api/admin/users', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: currentUser.username })
+                });
+                if (!response.ok) throw new Error('Failed to fetch users');
+                const users = await response.json();
+                users.filter(u => u.role === 'user').forEach(user => {
+                        const option = document.createElement('option');
+                        option.value = user.username;
+                        option.textContent = user.username;
+                        userSelect.appendChild(option);
+                });
+            } catch (err) {
+                userSelect.innerHTML = '<option value="">No users found</option>';
+            }
+            const yearSelect = document.getElementById('filterYear');
+            yearSelect.innerHTML = '';
+            const currentYear = new Date().getFullYear();
+            for (let y = 2000; y <= currentYear + 1; y++) {
+                    const option = document.createElement('option');
+                    option.value = y;
+                    option.textContent = y;
+                    yearSelect.appendChild(option);
+                }
+            yearSelect.value = currentYear;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelector('a[data-section="attendance"]').addEventListener('click', function() {
+                populateAttendanceYearDropdown();
+                document.getElementById('attendanceTableContainer').innerHTML = '';
+                populateFilterEditDropdowns();
+            });
+        });
+
+        document.getElementById('attendanceFilterForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const username = document.getElementById('filterUser').value;
+            const year = document.getElementById('filterYear').value;
+            const month = document.getElementById('filterMonth').value;
+            if (!username || !year || !month) {
+                document.getElementById('filterAttendanceTableContainer').innerHTML = '<div class="alert alert-warning">Please select user, year, and month.</div>';
+                return;
+            }
+            let records = [];
+            try {
+            const response = await fetch('/api/admin/get-attendance', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: currentUser.username, user: username, month: `${year}-${month}` })
+            });
+                if (response.ok) {
+                    records = await response.json();
+                }
+            } catch (err) {
+                document.getElementById('filterAttendanceTableContainer').innerHTML = '<div class="alert alert-danger">Failed to load attendance records.</div>';
+                return;
+            }
+            if (!records.length) {
+                document.getElementById('filterAttendanceTableContainer').innerHTML = '<div class="alert alert-info">Records not found for this month.</div>';
+                return;
+            }
+            const daysInMonth = new Date(year, month, 0).getDate();
+            let html = '<div class="table-responsive"><table class="table table-bordered align-middle text-center"><thead><tr><th>User</th>';
+            for (let d = 1; d <= daysInMonth; d++) {
+                html += `<th>${d}</th>`;
+            }
+            html += '</tr></thead><tbody>';
+            html += `<tr><td>${username}</td>`;
+            for (let d = 1; d <= daysInMonth; d++) {
+                const date = `${year}-${month}-${d.toString().padStart(2,'0')}`;
+                const rec = records.find(r => r.date === date);
+                const status = rec ? rec.status : '';
+                html += `<td>`;
+                if (rec) {
+                    html += `<select class=\"form-select form-select-sm filter-edit-cell\" data-username=\"${username}\" data-date=\"${date}\" style=\"width:60px;min-width:60px;max-width:80px;\">\n` +
+                        `<option value=\"present\" ${status==='present'?'selected':''}>P</option>\n` +
+                        `<option value=\"absent\" ${status==='absent'?'selected':''}>A</option>\n` +
+                        `<option value=\"late\" ${status==='late'?'selected':''}>L</option>\n` +
+                        `<option value=\"half-day\" ${status==='half-day'?'selected':''}>HD</option>\n` +
+                        `<option value=\"holiday\" ${status==='holiday'?'selected':''}>H</option>\n` +
+                    `</select>`;
+                } else {
+                    html += '-';
+                }
+                html += `</td>`;
+            }
+            html += '</tr></tbody></table></div>';
+            html += '<div class="mt-3"><button class="btn btn-success" id="saveFilterEditAttendanceBtn">Save Changes</button></div>';
+            document.getElementById('filterAttendanceTableContainer').innerHTML = html;
+        });
+
+        document.addEventListener('click', async function(e) {
+            if (e.target && e.target.id === 'saveFilterEditAttendanceBtn') {
+                const year = document.getElementById('filterYear').value;
+                const month = document.getElementById('filterMonth').value;
+                const selects = document.querySelectorAll('.filter-edit-cell');
+                const grouped = {};
+                selects.forEach(sel => {
+                    const username = sel.getAttribute('data-username');
+                    if (!grouped[username]) grouped[username] = [];
+                    grouped[username].push({ date: sel.getAttribute('data-date'), status: sel.value });
+                });
+                let success = true;
+                for (const [user, records] of Object.entries(grouped)) {
+                    const res = await fetch('/api/admin/mark-attendance', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username: currentUser.username, user, month: `${year}-${month}`, attendanceData: records })
+                    });
+                    if (!res.ok) success = false;
+                }
+                if (success) {
+                    showToast('Attendance updated successfully', 'success');
+                } else {
+                    showToast('Failed to update attendance', 'danger');
+                }
+            }
+        });
+
+            
+        let attendanceBreakdownChart;
+
+        
+        function setDashboardDatePickers() {
+            const now = new Date();
+            document.getElementById('breakdownDatePicker').value = now.toISOString().slice(0,10);
+        }
+
+        function setupDashboardAutoUpdate() {
+            document.getElementById('breakdownDatePicker').addEventListener('change', updateBreakdownChart);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelector('a[data-section="dashboard"]').addEventListener('click', function() {
+                setDashboardDatePickers();
+                setupDashboardAutoUpdate();
+                updateBreakdownChart();
+            });
+        });
+
+        if (document.getElementById('dashboard')) {
+            setDashboardDatePickers();
+            setupDashboardAutoUpdate();
+            updateBreakdownChart();
+        }
+
+        async function fetchAttendanceForDate(date) {
+            const response = await fetch('/api/admin/get-attendance', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: currentUser.username, date })
+            });
+            if (!response.ok) throw new Error('Failed to fetch attendance');
+            return await response.json();
+        }
+
+        async function updateBreakdownChart() {
+            const date = document.getElementById('breakdownDatePicker').value;
+            if (!date) return;
+            const attendance = await fetchAttendanceForDate(date);
+            const counts = { present: 0, absent: 0, late: 0, 'half-day': 0 };
+            attendance.forEach(r => {
+                if (counts[r.status] !== undefined) counts[r.status]++;
+            });
+            if (attendanceBreakdownChart) attendanceBreakdownChart.destroy();
+            attendanceBreakdownChart = new Chart(document.getElementById('attendanceBreakdownChart').getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Present', 'Absent', 'Late', 'Half Day'],
+                    datasets: [{
+                        data: [counts.present, counts.absent, counts.late, counts['half-day']],
+                        backgroundColor: ['#2ecc71', '#e74c3c', '#f1c40f', '#3498db']
+                    }]
+                },
+                options: {
+                    plugins: { legend: { display: true, position: 'bottom' } }
+                }
+            });
+        }
+    </script>
+</body>
+</html> 
